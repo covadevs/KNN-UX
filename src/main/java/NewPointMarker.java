@@ -13,10 +13,6 @@ public class NewPointMarker extends Marker {
         double halfSize = (double) markerSize / 2;
 
         Path2D.Double path = new Path2D.Double();
-        path.moveTo(xOffset + halfSize, yOffset);
-        path.lineTo(xOffset - halfSize, yOffset);
-        path.moveTo(xOffset, yOffset + halfSize);
-        path.lineTo(xOffset, yOffset - halfSize);
         path.moveTo(xOffset - halfSize, yOffset - halfSize);
         path.lineTo(xOffset + halfSize, yOffset + halfSize);
         path.moveTo(xOffset - halfSize, yOffset + halfSize);

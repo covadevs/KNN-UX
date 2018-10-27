@@ -13,19 +13,19 @@ import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.*;
 import java.util.List;
-import java.util.LinkedList;
-import java.util.Random;
 import java.util.stream.IntStream;
 
 public class Main {
     private int label0;
     private int label1;
     private int label2;
+    private int alpha;
 
     public static void main(String[] args) {
         Main m = new Main();
+        m.alpha = 128;
         Flower[] flowers = m.readFlowers("treinamento.csv");
         // Create Chart
         final XYChart chart = new XYChartBuilder().width(1920).height(1080).title("Flower Chart").xAxisTitle("Petal Length").yAxisTitle("Pedal Width").theme(Styler.ChartTheme.XChart).build();
@@ -34,7 +34,9 @@ public class Main {
         chart.getStyler().setLegendPosition(Styler.LegendPosition.OutsideE);
         chart.getStyler().setDefaultSeriesRenderStyle(XYSeries.XYSeriesRenderStyle.Scatter);
         chart.getStyler().setToolTipsEnabled(true);
-        chart.getStyler().setMarkerSize(10);
+        chart.getStyler().setToolTipHighlightColor(Color.white);
+        chart.getStyler().setPlotBackgroundColor(Color.white);
+        chart.getStyler().setMarkerSize(15);
 
         // Series
         List<Double> xData0 = new LinkedList<Double>();
@@ -62,9 +64,9 @@ public class Main {
             }
         }
 
-        chart.addSeries("Flowers 0", xData0, yData0).setMarkerColor(new Color(0,0,255, 128));
-        chart.addSeries("Flowers 1", xData1, yData1).setMarkerColor(new Color(255,255,0, 128));
-        chart.addSeries("Flowers 2", xData2, yData2).setMarkerColor(new Color(128,0,128, 128));
+        chart.addSeries("Flowers 0", xData0, yData0).setMarkerColor(new Color(153, 255, 51, m.alpha));
+        chart.addSeries("Flowers 1", xData1, yData1).setMarkerColor(new Color(255,61,0, m.alpha));
+        chart.addSeries("Flowers 2", xData2, yData2).setMarkerColor(new Color(0,0,0, m.alpha));
 //        series.setMarkerColor(Color.GREEN);
 
 
@@ -98,9 +100,21 @@ public class Main {
                 JTextField pwf = new JTextField("", 5);
                 JLabel k = new JLabel("K");
                 JTextField kf = new JTextField("", 5);
+
+                JLabel alphaL = new JLabel("Alpha");
+                JTextField alphaF = new JTextField("", 5);
                 plf.addFocusListener(focusListener);
                 pwf.addFocusListener(focusListener);
                 kf.addFocusListener(focusListener);
+                alphaF.addFocusListener(focusListener);
+
+                alphaF.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        m.alpha = Integer.parseInt(alphaF.getText().trim());
+                        frame.repaint();
+                    }
+                });
 
                 JButton button = new JButton("Add Point");
                 button.addActionListener(new ActionListener() {
@@ -124,11 +138,11 @@ public class Main {
                         }
 
                         chart.removeSeries("Flowers 0");
-                        chart.addSeries("Flowers 0", xData0, yData0).setMarker(SeriesMarkers.CIRCLE).setMarkerColor(new Color(0,0,255, 128));
+                        chart.addSeries("Flowers 0", xData0, yData0).setMarker(SeriesMarkers.CIRCLE).setMarkerColor(new Color(153, 255, 51, m.alpha));
                         chart.removeSeries("Flowers 1");
-                        chart.addSeries("Flowers 1", xData1, yData1).setMarker(SeriesMarkers.DIAMOND).setMarkerColor(new Color(255,255,0, 128));;
+                        chart.addSeries("Flowers 1", xData1, yData1).setMarker(SeriesMarkers.DIAMOND).setMarkerColor(new Color(255,61,0, m.alpha));
                         chart.removeSeries("Flowers 2");
-                        chart.addSeries("Flowers 2", xData2, yData2).setMarker(SeriesMarkers.SQUARE).setMarkerColor(new Color(128,0,128, 128));
+                        chart.addSeries("Flowers 2", xData2, yData2).setMarker(SeriesMarkers.SQUARE).setMarkerColor(new Color(0,0,0, m.alpha));
 
                         chart.removeSeries("New Point");
                         newPointx.clear();
@@ -150,6 +164,8 @@ public class Main {
                 panel.add(k);
                 panel.add(kf);
                 panel.add(button);
+                panel.add(alphaL);
+                panel.add(alphaF);
 
                 frame.add(panel, BorderLayout.SOUTH);
 
@@ -217,21 +233,73 @@ public class Main {
         Arrays.sort(dists);
         List<Double> xNeighboors = new LinkedList<>();
         List<Double> yNeighboors = new LinkedList<>();
+
+        List<Double> xNeighboorsL0 = new LinkedList<>();
+        List<Double> yNeighboorsL0 = new LinkedList<>();
+
+        List<Double> xNeighboorsL1 = new LinkedList<>();
+        List<Double> yNeighboorsL1 = new LinkedList<>();
+
+        List<Double> xNeighboorsL2 = new LinkedList<>();
+        List<Double> yNeighboorsL2 = new LinkedList<>();
+
         IntStream.range(0, k)
                 .forEach(index -> {
                     if(dists[index].getLabel() == 0) {
                         label0++;
+                        xNeighboorsL0.add(dists[index].getX());
+                        yNeighboorsL0.add(dists[index].getY());
                     } else if(dists[index].getLabel() == 1) {
                         label1++;
+                        xNeighboorsL1.add(dists[index].getX());
+                        yNeighboorsL1.add(dists[index].getY());
                     } else if(dists[index].getLabel() == 2) {
                         label2++;
+                        xNeighboorsL2.add(dists[index].getX());
+                        yNeighboorsL2.add(dists[index].getY());
                     }
-                    xNeighboors.add(dists[index].getX());
-                    yNeighboors.add(dists[index].getY());
                 });
-        chart.removeSeries("Neighboors");
-        chart.addSeries("Neighboors", xNeighboors, yNeighboors).setMarker(new NeighborMarker(flower.getPetalLength(),flower.getPetalWidth(), xNeighboors.get(0), yNeighboors.get(0), chart)).setMarkerColor(Color.GREEN).setShowInLegend(false);
-        return getLabel(label0, label1, label2);
+
+
+        int label = getLabel(label0, label1, label2);
+        chart.removeSeries("Neighbors0");
+        chart.removeSeries("Neighbors1");
+        chart.removeSeries("Neighbors2");
+        chart.removeSeries("Neighbors");
+
+        if(label == 0) {
+            xNeighboorsL1.addAll(xNeighboorsL2);
+            xNeighboors = xNeighboorsL1;
+
+            yNeighboorsL1.addAll(yNeighboorsL2);
+            yNeighboors = yNeighboorsL1;
+            chart.addSeries("Neighbors0", xNeighboorsL0, yNeighboorsL0).setMarker(new NeighborMarker(flower.getPetalLength(),flower.getPetalWidth(), chart)).setMarkerColor(new Color(153, 255, 51)).setShowInLegend(false);
+        } if(label == 1) {
+            xNeighboorsL0.addAll(xNeighboorsL2);
+            xNeighboors = xNeighboorsL0;
+
+            yNeighboorsL0.addAll(yNeighboorsL2);
+            yNeighboors = yNeighboorsL0;
+            chart.addSeries("Neighbors1", xNeighboorsL1, yNeighboorsL1).setMarker(new NeighborMarker(flower.getPetalLength(),flower.getPetalWidth(), chart)).setMarkerColor(new Color(255,61,0)).setShowInLegend(false);
+        } if(label == 2) {
+            xNeighboorsL0.addAll(xNeighboorsL1);
+            xNeighboors = xNeighboorsL0;
+
+            yNeighboorsL0.addAll(yNeighboorsL1);
+            yNeighboors = yNeighboorsL0;
+
+            chart.addSeries("Neighbors2", xNeighboorsL2, yNeighboorsL2).setMarker(new NeighborMarker(flower.getPetalLength(),flower.getPetalWidth(), chart)).setMarkerColor(Color.black).setShowInLegend(false);
+        }
+
+        if(xNeighboors.size() > 0) {
+            chart.addSeries("Neighbors", xNeighboors, yNeighboors).setMarker(new NeighborMarker(flower.getPetalLength(), flower.getPetalWidth(), chart)).setMarkerColor(Color.MAGENTA).setShowInLegend(false);
+        }
+        this.label0 = 0;
+        this.label1 = 0;
+        this.label2 = 0;
+
+
+        return label;
     }
 
     private Distance getDistance(Flower flowerOne, Flower flowerTwo) {
@@ -245,20 +313,15 @@ public class Main {
 
     private Integer getLabel(int label0, int label1, int label2) {
         if(label0 > label1 && label0 > label2) {
-            this.label0 = 0;
-            this.label1 = 0;
-            this.label2 = 0;
             return 0;
         } else if(label1 > label0 && label1 > label2) {
-            this.label0 = 0;
-            this.label1 = 0;
-            this.label2 = 0;
             return 1;
         } else {
-            this.label0 = 0;
-            this.label1 = 0;
-            this.label2 = 0;
             return 2;
         }
+    }
+
+    private void showNNbyLabel() {
+
     }
 }

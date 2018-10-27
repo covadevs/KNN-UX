@@ -12,16 +12,12 @@ public class NeighborMarker extends Marker {
     final BasicStroke stroke = new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL);
     private double toX;
     private double toY;
-    private double x;
-    private double y;
     private Styler xyStyler;
     private Chart chart;
 
-    public NeighborMarker(double toX, double toY, double x, double y, Chart chart) {
+    public NeighborMarker(double toX, double toY, Chart chart) {
         this.toX = toX;
         this.toY = toY;
-        this.x = x;
-        this.y = y;
         this.xyStyler = chart.getStyler();
         this.chart = chart;
     }
