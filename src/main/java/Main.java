@@ -27,18 +27,29 @@ public class Main {
         Main m = new Main();
         m.alpha = 128;
         Flower[] flowers = m.readFlowers("treinamento.csv");
-        // Create Chart
-        final XYChart chart = new XYChartBuilder().width(1920).height(1080).title("Flower Chart").xAxisTitle("Petal Length").yAxisTitle("Pedal Width").theme(Styler.ChartTheme.XChart).build();
+        /*
+            Cria o grafico vazio de altura 600 e largura 400 com titulo
+            flower chart com eixo X chamado de petal length e eixo y com pedal width
 
-        // Customize Chart
+         */
+
+        final XYChart chart = new XYChartBuilder().width(600).height(400).title("Flower Chart").xAxisTitle("Petal Length").yAxisTitle("Pedal Width").build();
+
+        /*
+            Personalizacao do grafico
+            a posicao das legendas ficarao fora do grafico no lado oeste,
+            o estilo de renderizacao vai ser para redenrizar um grafico Scatter
+            com as tooltips ativadas
+            e tamanho 15 para cada marcador
+         */
         chart.getStyler().setLegendPosition(Styler.LegendPosition.OutsideE);
         chart.getStyler().setDefaultSeriesRenderStyle(XYSeries.XYSeriesRenderStyle.Scatter);
         chart.getStyler().setToolTipsEnabled(true);
-        chart.getStyler().setToolTipHighlightColor(Color.white);
-        chart.getStyler().setPlotBackgroundColor(Color.white);
         chart.getStyler().setMarkerSize(15);
 
-        // Series
+        /*
+            listas vazias para cada conjunto de dados
+         */
         List<Double> xData0 = new LinkedList<Double>();
         List<Double> yData0 = new LinkedList<Double>();
 
@@ -51,6 +62,11 @@ public class Main {
         List<Double> newPointx = new LinkedList<>();
         List<Double> newPointy = new LinkedList<>();
 
+        /*
+            um laço for para colocar em cada lista a flor de cada label
+            ps: essas flores foram recuperadas do arquivo treinamento.csv que foi
+            lido pelo metodo readFlowers no comeco do metodo main
+         */
         for (int i = 0; i < flowers.length; i++) {
             if(flowers[i].getLabel() == 0) {
                 xData0.add(flowers[i].getPetalLength());
@@ -64,10 +80,15 @@ public class Main {
             }
         }
 
+        /*
+            apos as flores serem colocadas em suas devidas listas
+            as listas sao colocadas no grafico sendo cada tipo de flor
+            representada por uma Serie no grafico
+         */
+
         chart.addSeries("Flowers 0", xData0, yData0).setMarkerColor(new Color(153, 255, 51, m.alpha));
         chart.addSeries("Flowers 1", xData1, yData1).setMarkerColor(new Color(255,61,0, m.alpha));
         chart.addSeries("Flowers 2", xData2, yData2).setMarkerColor(new Color(0,0,0, m.alpha));
-//        series.setMarkerColor(Color.GREEN);
 
 
         // Schedule a job for the event-dispatching thread:
